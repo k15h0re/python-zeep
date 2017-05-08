@@ -14,7 +14,7 @@ class Transport(object):
     supports_async = False
 
     def __init__(self, cache=NotSet, timeout=300, operation_timeout=None,
-                 verify=True, http_auth=None, cert=None):
+                 verify=True, http_auth=None, cert=None, intercepts={}):
         """The transport object handles all communication to the SOAP server.
 
         :param cache: The cache object to be used to cache GET requests
@@ -38,6 +38,7 @@ class Transport(object):
         }
         self.cert = cert
         self.session = self.create_session()
+        self.intercepts = intercepts
 
     def create_session(self):
         session = requests.Session()
@@ -56,6 +57,8 @@ class Transport(object):
         :param headers: a dictionary with the HTTP headers.
 
         """
+        for i in self.intercepts:
+            address.replace(i, intecepts[i])
         response = self.session.get(
             address,
             params=params,
@@ -71,6 +74,8 @@ class Transport(object):
         :param headers: a dictionary with the HTTP headers.
 
         """
+        for i in self.intercepts:
+            address.replace(i, intecepts[i])
         if self.logger.isEnabledFor(logging.DEBUG):
             log_message = message
             if isinstance(log_message, bytes):
